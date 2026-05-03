@@ -1,691 +1,436 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FlowUp | שליחת חשבון עסקה</title>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --green: #00a8e8;
-      --green-dark: #0082c8;
-      --green-light: #e6f5ff;
-      --green-mid: #b3e0f7;
-      --navy: #0a1628;
-      --navy-2: #162233;
-      --navy-3: #1e3148;
-      --gray: #f4f6f9;
-      --gray-2: #e8ecf2;
-      --gray-3: #c8d0dc;
-      --text: #0d1b2a;
-      --text-2: #4a5568;
-      --text-3: #8a97a8;
-      --white: #ffffff;
-      --red: #ff4757;
-      --blue: #3b82f6;
-      --blue-light: #eff6ff;
-      --radius: 12px;
-      --radius-sm: 8px;
-      --shadow: 0 4px 24px rgba(13,27,42,0.08);
-      --shadow-lg: 0 8px 40px rgba(13,27,42,0.14);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Heebo', sans-serif; background: var(--gray); color: var(--text); min-height: 100vh; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoSend — פלטפורמת הודעות אוטומטיות</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Layout ── */
-    .app { display: flex; min-height: 100vh; }
+  :root {
+    --bg: #f7f6f3;
+    --bg2: #ffffff;
+    --bg3: #eeece8;
+    --text: #1a1a18;
+    --text2: #6b6a65;
+    --text3: #a8a79f;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --green: #2d7a4f;
+    --green-bg: #e8f5ee;
+    --blue: #1a5fa8;
+    --blue-bg: #e3f0fb;
+    --amber: #b45309;
+    --amber-bg: #fef3c7;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
 
-    /* ── Sidebar ── */
-    .sidebar {
-      width: 220px; flex-shrink: 0;
-      background: var(--navy);
-      display: flex; flex-direction: column;
-      padding: 0;
-    }
-    .sidebar-top {
-      padding: 1.5rem 1.25rem 1.25rem;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    /* Logo SVG */
-    .logo-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
-    .logo-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: linear-gradient(135deg, #1565c0 0%, #00a8e8 100%);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .logo-icon svg { width: 20px; height: 20px; }
-    .logo-name { font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-    .logo-name span { color: var(--green); }
-    .logo-tagline { font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.04em; padding-right: 46px; }
+  body {
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
 
-    .nav { flex: 1; padding: 1rem 0.75rem; }
-    .nav-section-label {
-      font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.25);
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 0.75rem 0.5rem 0.25rem;
-    }
-    .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 0.55rem 0.75rem; border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5);
-      cursor: pointer; transition: all 0.15s; margin-bottom: 2px;
-    }
-    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
-    .nav-item.active { background: rgba(0,195,122,0.15); color: var(--green); }
-    .nav-item .nav-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green); flex-shrink: 0;
-      display: none;
-    }
-    .nav-item.active .nav-dot { display: block; }
-    .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+  .sidebar {
+    width: 230px;
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: 100vh;
+  }
 
-    .sidebar-bottom {
-      padding: 1rem 0.75rem;
-      border-top: 1px solid rgba(255,255,255,0.07);
-    }
-    .user-card {
-      display: flex; align-items: center; gap: 10px;
-      padding: 0.6rem 0.75rem; border-radius: var(--radius-sm);
-      background: rgba(255,255,255,0.05);
-    }
-    .user-avatar {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--green), #0099cc);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
-    }
-    .user-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.75); }
-    .user-plan { font-size: 10px; color: var(--green); }
+  .logo { padding: 18px 16px 14px; border-bottom: 1px solid var(--border); }
+  .logo-text { font-size: 15px; font-weight: 600; }
+  .logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-    /* ── Main ── */
-    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .nav { padding: 10px 8px; flex: 1; overflow-y: auto; }
 
-    /* ── Topbar ── */
-    .topbar {
-      background: var(--white);
-      border-bottom: 1px solid var(--gray-2);
-      padding: 0 1.75rem;
-      height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      position: sticky; top: 0; z-index: 50;
-    }
-    .topbar-left { display: flex; flex-direction: column; gap: 1px; }
-    .topbar-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
-    .topbar-sub { font-size: 11px; color: var(--text-3); }
-    .topbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .nav-section {
+    padding: 10px 8px 4px;
+    font-size: 10px; color: var(--text3);
+    text-transform: uppercase; letter-spacing: .07em; font-weight: 500;
+  }
 
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: 600; padding: 4px 10px;
-      border-radius: 20px; white-space: nowrap;
-    }
-    .status-green { background: var(--green-light); color: var(--green-dark); }
-    .status-blue { background: var(--blue-light); color: var(--blue); }
-    .pulse { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 10px; border-radius: var(--radius);
+    cursor: pointer; font-size: 13px; color: var(--text2);
+    transition: all .13s; margin-bottom: 1px; user-select: none;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--bg); color: var(--text); font-weight: 500; border: 1px solid var(--border); }
+  .nav-icon { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
 
-    .topbar-stat {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 12px; color: var(--text-2); padding: 0 8px;
-      border-right: 1px solid var(--gray-2);
-    }
-    .topbar-stat:last-of-type { border-right: none; }
-    .topbar-stat strong { color: var(--text); font-weight: 700; }
+  .projects-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px; border-radius: var(--radius);
+    cursor: pointer; font-size: 13px; color: var(--text2);
+    transition: all .13s; margin-bottom: 1px; user-select: none;
+  }
+  .projects-toggle:hover { background: var(--bg3); color: var(--text); }
+  .toggle-left { display: flex; align-items: center; gap: 9px; }
+  .chevron { font-size: 10px; transition: transform .2s; color: var(--text3); display: inline-block; }
+  .chevron.open { transform: rotate(90deg); }
 
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 16px; border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      border: none; font-family: 'Heebo', sans-serif;
-      transition: all 0.15s; white-space: nowrap;
-    }
-    .btn-outline {
-      background: var(--white); color: var(--text-2);
-      border: 1.5px solid var(--gray-2);
-    }
-    .btn-outline:hover { border-color: var(--gray-3); background: var(--gray); }
-    .btn-green { background: var(--green); color: #fff; }
-    .btn-green:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,195,122,0.3); }
-    .btn-red { background: var(--red); color: #fff; }
-    .btn-red:hover { background: #e03347; transform: translateY(-1px); }
-    .btn-navy { background: var(--navy); color: #fff; }
-    .btn-navy:hover { background: var(--navy-2); }
+  .proj-list { overflow: hidden; max-height: 0; transition: max-height .25s ease; }
+  .proj-list.open { max-height: 500px; }
 
-    /* ── Content ── */
-    .content { flex: 1; padding: 1.75rem; overflow-y: auto; }
+  .proj-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px 6px 30px;
+    cursor: pointer; font-size: 12px; color: var(--text2);
+    border-radius: var(--radius); transition: all .13s; margin-bottom: 1px; user-select: none;
+  }
+  .proj-item:hover { background: var(--bg3); color: var(--text); }
+  .proj-item.active-proj { background: var(--bg); color: var(--text); font-weight: 500; border: 1px solid var(--border); }
+  .proj-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-    /* ── Steps ── */
-    .steps-card {
-      background: var(--white); border-radius: var(--radius);
-      border: 1px solid var(--gray-2); padding: 1.25rem 2rem;
-      margin-bottom: 1.25rem; box-shadow: var(--shadow);
-      display: flex; align-items: center;
-    }
-    .step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
-    .step-circle {
-      width: 42px; height: 42px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; background: var(--gray); border: 2px solid var(--gray-2);
-      transition: all 0.3s;
-    }
-    .step.done .step-circle { background: var(--green-light); border-color: var(--green-mid); }
-    .step.active .step-circle {
-      background: var(--green); border-color: var(--green);
-      box-shadow: 0 0 0 4px rgba(0,195,122,0.15);
-    }
-    .step.active .step-circle svg { stroke: #fff; }
-    .step-label { font-size: 11px; font-weight: 600; color: var(--text-3); }
-    .step.active .step-label { color: var(--green); }
-    .step.done .step-label { color: var(--green-dark); }
-    .step-line { flex: 1; height: 2px; background: var(--gray-2); margin: 0 8px; margin-bottom: 24px; border-radius: 2px; }
-    .step-line.done { background: var(--green-mid); }
+  .proj-add {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px 6px 30px;
+    cursor: pointer; font-size: 11px; color: var(--text3);
+    border-radius: var(--radius); transition: all .13s; margin-top: 2px;
+  }
+  .proj-add:hover { background: var(--bg3); color: var(--text2); }
 
-    /* ── Stats row ── */
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
-    .stat-card {
-      background: var(--white); border-radius: var(--radius);
-      border: 1px solid var(--gray-2); padding: 1.1rem 1.25rem;
-      box-shadow: var(--shadow);
-      display: flex; align-items: center; gap: 14px;
-    }
-    .stat-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; flex-shrink: 0;
-    }
-    .stat-icon.green { background: var(--green-light); }
-    .stat-icon.blue { background: var(--blue-light); }
-    .stat-icon.navy { background: rgba(13,27,42,0.07); }
-    .stat-num { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; }
-    .stat-label { font-size: 11px; color: var(--text-3); font-weight: 500; margin-top: 3px; }
+  .sidebar-bottom { padding: 12px 10px; border-top: 1px solid var(--border); }
+  .sidebar-bottom-label { font-size: 10px; color: var(--text3); margin-bottom: 7px; }
 
-    /* ── Main section ── */
-    .section {
-      background: var(--white); border-radius: var(--radius);
-      border: 1px solid var(--gray-2); box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .section-header {
-      padding: 1.1rem 1.5rem;
-      border-bottom: 1px solid var(--gray-2);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 10px;
-    }
-    .section-title { font-size: 15px; font-weight: 700; color: var(--text); }
-    .section-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-    .section-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .section-body { padding: 1.25rem 1.5rem; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* ── Import bar ── */
-    .import-bar {
-      display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap;
-    }
-    .import-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 8px 16px; border-radius: var(--radius-sm);
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      border: 1.5px solid var(--gray-2); background: var(--white);
-      color: var(--text-2); font-family: 'Heebo', sans-serif;
-      transition: all 0.15s;
-    }
-    .import-btn:hover { border-color: var(--gray-3); background: var(--gray); transform: translateY(-1px); }
+  .topbar {
+    padding: 14px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); flex-shrink: 0;
+  }
+  .topbar-title { font-size: 15px; font-weight: 600; }
+  .topbar-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-    /* ── Invoice row ── */
-    .invoice-list { display: flex; flex-direction: column; gap: 10px; }
-    .invoice-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 1.25rem; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-2); background: var(--gray);
-      transition: all 0.2s; gap: 12px;
-    }
-    .invoice-row:hover { border-color: var(--green-mid); background: var(--green-light); box-shadow: 0 2px 12px rgba(0,195,122,0.1); }
-    .invoice-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
-    .invoice-avatar {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: linear-gradient(135deg, #1565c0, #00a8e8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
-    }
-    .invoice-name { font-size: 14px; font-weight: 700; color: var(--text); }
-    .invoice-link { font-size: 11px; color: var(--text-3); font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
-    .invoice-schedule {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 11px; font-weight: 600; color: var(--blue);
-      background: var(--blue-light); padding: 2px 8px; border-radius: 20px; margin-top: 4px;
-    }
-    .invoice-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-    .icon-btn {
-      width: 32px; height: 32px; border-radius: var(--radius-sm);
-      border: 1.5px solid var(--gray-2); background: var(--white);
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      font-size: 14px; transition: all 0.15s;
-    }
-    .icon-btn:hover { background: var(--gray); border-color: var(--gray-3); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 14px; border-radius: var(--radius);
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border2); background: var(--bg2); color: var(--text);
+    transition: all .13s; font-family: inherit;
+  }
+  .btn:hover { background: var(--bg3); }
+  .btn-primary { background: var(--text); color: var(--bg2); border-color: transparent; }
+  .btn-primary:hover { opacity: .85; }
 
-    /* ── Empty state ── */
-    .empty {
-      text-align: center; padding: 3rem 1rem; color: var(--text-3);
-    }
-    .empty-icon { font-size: 48px; margin-bottom: 1rem; opacity: 0.4; }
-    .empty-text { font-size: 14px; }
+  .content { flex: 1; overflow-y: auto; padding: 20px 22px; }
 
-    /* ── Modal ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(13,27,42,0.55); backdrop-filter: blur(4px);
-      z-index: 100; align-items: center; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white); border-radius: 16px;
-      padding: 2rem; width: 480px; max-width: 95vw;
-      box-shadow: var(--shadow-lg);
-      animation: slideUp 0.2s ease;
-    }
-    @keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
-    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; }
-    .modal-title { font-size: 18px; font-weight: 800; color: var(--text); }
-    .modal-close { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--gray); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-2); }
-    .modal-close:hover { background: var(--gray-2); }
-    .form-row { margin-bottom: 1rem; }
-    .form-label { font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 6px; display: block; }
-    .form-input {
-      width: 100%; padding: 10px 14px;
-      border: 1.5px solid var(--gray-2); border-radius: var(--radius-sm);
-      background: var(--white); color: var(--text);
-      font-size: 14px; font-family: 'Heebo', sans-serif;
-      transition: border-color 0.15s;
-    }
-    .form-input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,195,122,0.1); }
-    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.5rem; }
+  .proj-header {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+    padding: 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  }
+  .proj-avatar { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .proj-name { font-size: 16px; font-weight: 600; }
+  .proj-desc { font-size: 12px; color: var(--text3); margin-top: 3px; }
 
-    /* ── Send modal ── */
-    .send-info { display: flex; align-items: center; gap: 10px; background: var(--gray); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1rem; }
-    .send-info-icon { font-size: 22px; }
-    .send-info-text { font-size: 13px; color: var(--text-2); }
-    .send-info-text strong { color: var(--text); }
-    .msg-preview { background: var(--green-light); border: 1.5px solid var(--green-mid); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 0.5rem; }
-    .msg-preview-label { font-size: 10px; font-weight: 700; color: var(--green-dark); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
-    .msg-preview-text { font-size: 13px; color: var(--text); line-height: 1.7; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+  .bg-green { background: var(--green-bg); color: var(--green); }
+  .bg-amber { background: var(--amber-bg); color: var(--amber); }
+  .bg-blue  { background: var(--blue-bg);  color: var(--blue); }
 
-    /* ── Upload zone ── */
-    .upload-zone {
-      border: 2px dashed var(--gray-2); border-radius: var(--radius);
-      padding: 3rem 1rem; text-align: center; cursor: pointer;
-      transition: all 0.2s; margin-bottom: 1rem;
-      background: var(--gray);
-    }
-    .upload-zone:hover { border-color: var(--green); background: var(--green-light); }
-    .upload-zone-icon { font-size: 40px; margin-bottom: 0.75rem; }
-    .upload-zone-text { font-size: 14px; font-weight: 600; color: var(--text-2); }
-    .upload-zone-sub { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+  .steps-bar {
+    display: flex; align-items: center;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 18px; margin-bottom: 16px;
+  }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; position: relative; cursor: pointer; }
+  .step-line { position: absolute; top: 14px; left: calc(50% + 17px); right: calc(-50% + 17px); height: 1px; background: var(--border2); }
+  .step:last-child .step-line { display: none; }
+  .step-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; border: 1px solid var(--border2);
+    background: var(--bg); color: var(--text3); flex-shrink: 0; font-weight: 500;
+  }
+  .step-dot.done { background: var(--green-bg); border-color: #4CAF50; color: var(--green); }
+  .step-dot.cur  { background: var(--text); color: var(--bg2); border-color: transparent; }
+  .step-lbl { font-size: 10px; color: var(--text3); text-align: center; }
+  .step-lbl.cur { color: var(--text); font-weight: 500; }
 
-    /* ── Toast ── */
-    #toast {
-      display: none; position: fixed; bottom: 28px; left: 50%;
-      transform: translateX(-50%);
-      background: var(--navy); color: #fff;
-      padding: 12px 24px; border-radius: 40px;
-      font-size: 13px; font-weight: 600; z-index: 200;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-      display: none; align-items: center; gap: 8px;
-      white-space: nowrap;
-    }
-    #toast.show { display: flex; animation: fadeInUp 0.25s ease; }
-    @keyframes fadeInUp { from{transform:translateX(-50%) translateY(10px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
-    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-  </style>
+  .conn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .conn-card {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px; cursor: pointer; transition: all .13s; background: var(--bg2);
+  }
+  .conn-card:hover { border-color: var(--border2); background: var(--bg); }
+  .conn-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .conn-ico { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .conn-nm { font-size: 13px; font-weight: 500; }
+  .conn-dsc { font-size: 11px; color: var(--text3); line-height: 1.4; }
+
+  .msg-box { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .msg-tabs { display: flex; background: var(--bg); }
+  .mtab { padding: 8px 14px; font-size: 12px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text3); transition: all .13s; }
+  .mtab.on { color: var(--text); border-bottom-color: var(--text); background: var(--bg2); font-weight: 500; }
+  .msg-body { padding: 14px; background: var(--bg2); display: flex; gap: 10px; }
+  .bubble { border-radius: 0 12px 12px 12px; padding: 10px 13px; font-size: 12px; line-height: 1.6; max-width: 88%; }
+  .vtag { display: inline-block; background: rgba(0,0,0,.08); border-radius: 3px; padding: 0 4px; font-size: 10px; font-weight: 600; }
+  .av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; flex-shrink: 0; margin-top: 2px; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat { background: var(--bg); border-radius: var(--radius); padding: 12px 14px; border: 1px solid var(--border); }
+  .stat-n { font-size: 22px; font-weight: 600; }
+  .stat-l { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .section-label {
+    font-size: 10px; font-weight: 600; color: var(--text3);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 10px; margin-top: 18px;
+  }
+  .section-label:first-child { margin-top: 0; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.4); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border-radius: var(--radius-lg); padding: 24px; width: 360px; border: 1px solid var(--border2); }
+  .modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .modal p { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+  .modal input, .modal select {
+    width: 100%; padding: 9px 12px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--bg);
+    font-size: 13px; color: var(--text); outline: none; margin-bottom: 10px;
+    font-family: inherit; direction: rtl;
+  }
+  .modal input:focus, .modal select:focus { border-color: var(--text); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+</style>
 </head>
 <body>
-<div class="app">
 
-  <!-- ── Sidebar ── -->
-  <div class="sidebar">
-    <div class="sidebar-top">
-      <div class="logo-wrap" style="justify-content:center;padding:4px 0;">
-        <img src="data:image/png;base64,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" alt="FlowUp" style="height:64px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));" />
-      </div>
-      <div class="logo-tagline">אוטומציה חכמה לעסקים</div>
-    </div>
-
-    <div class="nav">
-      <div class="nav-section-label">ראשי</div>
-      <div class="nav-item">
-        <span class="nav-icon">🏠</span> דף הבית
-      </div>
-
-      <div class="nav-section-label">חברות</div>
-      <div class="nav-item active">
-        <span class="nav-dot"></span>
-        <span class="nav-icon">📄</span> טולקה
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">💬</span> טסטאפ
-      </div>
-
-      <div class="nav-section-label">כלים</div>
-      <div class="nav-item">
-        <span class="nav-icon">📊</span> דוחות
-      </div>
-      <div class="nav-item">
-        <span class="nav-icon">⚙️</span> הגדרות
-      </div>
-
-      <div class="nav-section-label">מרחבים</div>
-      <div class="nav-item">
-        <span class="nav-icon">📁</span> מרחבים
-        <span style="margin-right:auto;font-size:10px;background:rgba(0,195,122,0.15);color:var(--green);padding:2px 7px;border-radius:20px;font-weight:700;">חדש</span>
-      </div>
-    </div>
-
-    <div class="sidebar-bottom">
-      <div id="update-card" style="background:rgba(0,168,232,0.1);border:1px solid rgba(0,168,232,0.25);border-radius:10px;padding:10px 12px;margin-bottom:10px;cursor:default;">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px;">עדכון אחרון</div>
-        <div id="update-time" style="font-size:12px;font-weight:600;color:rgba(0,168,232,0.9);line-height:1.5;"></div>
-        <div style="display:flex;align-items:center;gap:5px;margin-top:6px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:#00a8e8;animation:pulse 2s infinite;"></div>
-          <span style="font-size:10px;color:rgba(255,255,255,0.35);">מחובר ל-GitHub</span>
-        </div>
-      </div>
-      <div class="user-card">
-        <div class="user-avatar">FU</div>
-        <div>
-          <div class="user-name">FlowUp User</div>
-          <div class="user-plan">✦ Pro Plan</div>
-        </div>
-      </div>
-    </div>
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-text">📡 AutoSend</div>
+    <div class="logo-sub">פלטפורמת הודעות אוטומטיות</div>
   </div>
 
-  <!-- ── Main ── -->
-  <div class="main">
+  <div class="nav">
+    <div class="nav-section">פרויקטים</div>
 
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <div class="topbar-title">שליחת חשבון עסקה</div>
-        <div class="topbar-sub">טעני גיליון, בחרי לקוחות, ושלחי חשבונות בווטסאפ בלחיצה אחת</div>
+    <div class="projects-toggle" onclick="toggleProjects()">
+      <div class="toggle-left">
+        <div class="nav-icon" style="background:#EDE9FE;color:#5B21B6">📁</div>
+        כל הפרויקטים
       </div>
-      <div class="topbar-right">
-        <div class="topbar-stat">
-          <strong>18.46</strong> $ דולר אמריקאי
-        </div>
-        <div class="topbar-stat">
-          💬 <strong>410</strong> הדעות
-        </div>
-        <span class="status-pill status-green"><span class="pulse"></span>חשבונית ירוקה מחובר</span>
-        <span class="status-pill status-blue"><span class="pulse"></span>ווטסאפ מחובר</span>
-        <button class="btn btn-red" onclick="openSend()">📤 טוויליו</button>
-        <button class="btn btn-green" onclick="openSend()">💰 טען כסף</button>
-      </div>
+      <span class="chevron open" id="chevron">›</span>
     </div>
 
-    <div class="content">
-
-      <!-- Steps -->
-      <div class="steps-card">
-        <div class="step done">
-          <div class="step-circle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c37a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="step-label">טעינת גיליון</div>
-        </div>
-        <div class="step-line done"></div>
-        <div class="step done">
-          <div class="step-circle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c37a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="step-label">רשימת לקוחות</div>
-        </div>
-        <div class="step-line done"></div>
-        <div class="step done">
-          <div class="step-circle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c37a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div class="step-label">אישור שליחה</div>
-        </div>
-        <div class="step-line done"></div>
-        <div class="step active">
-          <div class="step-circle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </div>
-          <div class="step-label">נשלח</div>
-        </div>
+    <div class="proj-list open" id="proj-list">
+      <div class="proj-item active-proj" id="pi-soliqa" onclick="openProject('soliqa')">
+        <div class="proj-dot" style="background:#4CAF50"></div> סוליקה
       </div>
-
-      <!-- Stats -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-icon green">📨</div>
-          <div>
-            <div class="stat-num">1</div>
-            <div class="stat-label">גיליונות פעילים</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon blue">👥</div>
-          <div>
-            <div class="stat-num">3</div>
-            <div class="stat-label">לקוחות בגיליון</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon navy">✅</div>
-          <div>
-            <div class="stat-num">410</div>
-            <div class="stat-label">הודעות נשלחו</div>
-          </div>
-        </div>
+      <div class="proj-item" id="pi-merhavim" onclick="openProject('merhavim')">
+        <div class="proj-dot" style="background:#2196F3"></div> מרחבים
       </div>
-
-      <!-- Main section -->
-      <div class="section">
-        <div class="section-header">
-          <div>
-            <div class="section-title">הגיליונות השמורים שלך</div>
-            <div class="section-sub">לחצי על גיליון כדי לטעון ממנו לקוחות</div>
-          </div>
-          <div class="section-actions">
-            <button class="import-btn" onclick="openImportCSV()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              העלאת CSV / Excel
-            </button>
-            <button class="import-btn" onclick="openImportCSV()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              גיליונות גוגל
-            </button>
-            <button class="btn btn-green" onclick="openAddInvoice()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              הוסף גיליון חדש
-            </button>
-          </div>
-        </div>
-
-        <div class="section-body">
-          <div class="invoice-list" id="invoice-list">
-            <div class="invoice-row">
-              <div class="invoice-left">
-                <div class="invoice-avatar">📋</div>
-                <div>
-                  <div class="invoice-name">לקוחות טסט</div>
-                  <div class="invoice-link">docs.google.com/spreadsheets/d/1BxiMVs0XRA...</div>
-                  <div><span class="invoice-schedule">🕙 אוטומטי · סוף כל חודש 10:00</span></div>
-                </div>
-              </div>
-              <div class="invoice-actions">
-                <button class="icon-btn" title="מחק" onclick="removeInvoice(this)">🗑</button>
-                <button class="icon-btn" title="ערוך">✏️</button>
-                <button class="btn btn-green" onclick="openSend()">טען עכשיו ›</button>
-              </div>
-            </div>
-          </div>
-          <div id="empty-state" style="display:none;">
-            <div class="empty">
-              <div class="empty-icon">📂</div>
-              <div class="empty-text">אין גיליונות עדיין — הוסף את הראשון!</div>
-            </div>
-          </div>
-        </div>
+      <div class="proj-item" id="pi-startup" onclick="openProject('startup')">
+        <div class="proj-dot" style="background:#FF9800"></div> סטפאפ
       </div>
+      <div class="proj-add" onclick="openModal()">+ הוסף פרויקט</div>
+    </div>
 
+    <div class="nav-section" style="margin-top:10px">ערוצים</div>
+    <div class="nav-item"><div class="nav-icon" style="background:#E8F5E9;color:#2E7D32">💬</div> WhatsApp</div>
+    <div class="nav-item"><div class="nav-icon" style="background:#E3F2FD;color:#1565C0">📱</div> SMS</div>
+    <div class="nav-item"><div class="nav-icon" style="background:#FFF3E0;color:#E65100">📧</div> אימייל</div>
+
+    <div class="nav-section" style="margin-top:10px">מקורות</div>
+    <div class="nav-item"><div class="nav-icon" style="background:#E8F5E9;color:#2E7D32;font-size:9px">📊</div> Google Sheets</div>
+    <div class="nav-item"><div class="nav-icon" style="background:#F0FDF4;color:#166534;font-size:9px">📄</div> חשבונית ירוקה</div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-bottom-label">חיבורים פעילים</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">
+      <span class="badge bg-green">Twilio ✓</span>
+      <span class="badge bg-green">Resend ✓</span>
+      <span class="badge bg-blue">Sheets ✓</span>
     </div>
   </div>
 </div>
 
-<!-- Modal: Add Invoice -->
-<div class="modal-overlay" id="modal-add">
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="main-title">סוליקה</div>
+      <div class="topbar-sub" id="main-sub">Google Sheets → חשבונית ירוקה → WhatsApp</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn">לוגים</button>
+      <button class="btn btn-primary">▶ הפעל זרימה</button>
+    </div>
+  </div>
+  <div class="content" id="main-content"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">➕ הוסף גיליון חדש</div>
-      <button class="modal-close" onclick="closeModal('modal-add')">✕</button>
-    </div>
-    <div class="form-row">
-      <label class="form-label">שם הגיליון</label>
-      <input class="form-input" id="new-name" placeholder="לדוגמה: לקוחות ינואר 2026" />
-    </div>
-    <div class="form-row">
-      <label class="form-label">לינק לגיליון גוגל</label>
-      <input class="form-input" id="new-link" placeholder="https://docs.google.com/spreadsheets/..." />
-    </div>
-    <div class="form-row">
-      <label class="form-label">שליחה אוטומטית (אופציונלי)</label>
-      <input class="form-input" id="new-schedule" placeholder="לדוגמה: כל ראשון בשעה 09:00" />
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-add')">ביטול</button>
-      <button class="btn btn-green" onclick="addInvoice()">הוסף גיליון ✓</button>
+    <h3>פרויקט חדש</h3>
+    <p>הוסף לקוח / עסק חדש לפלטפורמה</p>
+    <input type="text" id="new-proj-name" placeholder="שם הפרויקט (למשל: סוליקה)" />
+    <input type="text" id="new-proj-desc" placeholder="תיאור קצר..." />
+    <select id="new-proj-channel">
+      <option value="wa">WhatsApp</option>
+      <option value="sms">SMS</option>
+      <option value="email">אימייל</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">ביטול</button>
+      <button class="btn btn-primary" onclick="addProject()">הוסף ▶</button>
     </div>
   </div>
 </div>
-
-<!-- Modal: Send -->
-<div class="modal-overlay" id="modal-send">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">📤 שלח חשבונות דרך ווטסאפ</div>
-      <button class="modal-close" onclick="closeModal('modal-send')">✕</button>
-    </div>
-    <div class="send-info">
-      <div class="send-info-icon">👥</div>
-      <div class="send-info-text">נמצאו <strong>3 לקוחות</strong> בגיליון. האם לשלוח לכולם?</div>
-    </div>
-    <div class="msg-preview">
-      <div class="msg-preview-label">תצוגה מקדימה של הודעה</div>
-      <div class="msg-preview-text">שלום {שם לקוח}, מצורף חשבון עסקה מספר {מספר חשבון} על סך {סכום} ₪.<br>תודה על שיתוף הפעולה! 🙏</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-send')">ביטול</button>
-      <button class="btn btn-green" onclick="confirmSend()">שלח לכולם ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: CSV Upload -->
-<div class="modal-overlay" id="modal-csv">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">📂 העלאת קובץ</div>
-      <button class="modal-close" onclick="closeModal('modal-csv')">✕</button>
-    </div>
-    <div class="upload-zone" onclick="fakeUpload()">
-      <div class="upload-zone-icon">☁️</div>
-      <div class="upload-zone-text">גרור קובץ לכאן או לחץ לבחירה</div>
-      <div class="upload-zone-sub">.csv, .xlsx נתמכים · עד 10MB</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-csv')">ביטול</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div id="toast"><span class="toast-dot"></span><span id="toast-msg"></span></div>
 
 <script>
-  function openAddInvoice() { document.getElementById('modal-add').classList.add('open'); }
-  function openSend() { document.getElementById('modal-send').classList.add('open'); }
-  function openImportCSV() { document.getElementById('modal-csv').classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+var currentProject = 'soliqa';
+var newCounter = 0;
+var COLORS = ['#9C27B0','#F44336','#009688','#795548','#607D8B','#E91E63','#3F51B5'];
 
-  function addInvoice() {
-    const name = document.getElementById('new-name').value.trim();
-    const link = document.getElementById('new-link').value.trim();
-    const schedule = document.getElementById('new-schedule').value.trim();
-    if (!name) { document.getElementById('new-name').focus(); return; }
-    const emojis = ['📊','📋','📁','🗂️','📌'];
-    const emoji = emojis[Math.floor(Math.random()*emojis.length)];
-    const list = document.getElementById('invoice-list');
-    const row = document.createElement('div');
-    row.className = 'invoice-row';
-    row.innerHTML = `
-      <div class="invoice-left">
-        <div class="invoice-avatar">${emoji}</div>
-        <div>
-          <div class="invoice-name">${name}</div>
-          <div class="invoice-link">${link || 'ללא לינק'}</div>
-          ${schedule ? `<div><span class="invoice-schedule">🕙 ${schedule}</span></div>` : ''}
-        </div>
-      </div>
-      <div class="invoice-actions">
-        <button class="icon-btn" onclick="removeInvoice(this)" title="מחק">🗑</button>
-        <button class="icon-btn" title="ערוך">✏️</button>
-        <button class="btn btn-green" onclick="openSend()">טען עכשיו ›</button>
-      </div>`;
-    list.appendChild(row);
-    closeModal('modal-add');
-    ['new-name','new-link','new-schedule'].forEach(id => document.getElementById(id).value = '');
-    updateStats();
-    showToast('הגיליון נוסף בהצלחה ✓');
+var projects = {
+  soliqa: {
+    title:'סוליקה', sub:'Google Sheets → חשבונית ירוקה → WhatsApp',
+    icon:'🟢', iconBg:'#E8F5E9', dot:'#4CAF50',
+    status:'פעיל', statusClass:'bg-green',
+    desc:'תזכורות תשלום אוטומטיות ללקוחות',
+    stats:['247','94%','₪18,400'], statLabels:['הודעות נשלחו','שיעור פתיחה','גבייה שהואצה'],
+    steps:['✓','✓','3','4'], stepLabels:['Google Sheets','חשבונית ירוקה','תבנית הודעה','לוח זמנים'],
+    bubbleBg:'#E8F5E9', bubbleColor:'#1B5E20', avColor:'#4CAF50', channel:'WhatsApp'
+  },
+  merhavim: {
+    title:'מרחבים', sub:'Google Sheets → Twilio → SMS',
+    icon:'🔵', iconBg:'#E3F2FD', dot:'#2196F3',
+    status:'בהגדרה', statusClass:'bg-amber',
+    desc:'תזכורות SMS להגעה לפגישות',
+    stats:['58','88%','₪4,200'], statLabels:['הודעות נשלחו','שיעור פתיחה','גבייה שהואצה'],
+    steps:['✓','2','3','4'], stepLabels:['Google Sheets','Twilio SMS','תבנית הודעה','לוח זמנים'],
+    bubbleBg:'#E3F2FD', bubbleColor:'#0D47A1', avColor:'#2196F3', channel:'SMS'
+  },
+  startup: {
+    title:'סטפאפ', sub:'Google Sheets → Resend → אימייל',
+    icon:'🟠', iconBg:'#FFF3E0', dot:'#FF9800',
+    status:'טיוטה', statusClass:'bg-amber',
+    desc:'ניוזלטר שבועי ועדכוני מוצר',
+    stats:['0','—','—'], statLabels:['הודעות נשלחו','שיעור פתיחה','גבייה שהואצה'],
+    steps:['1','2','3','4'], stepLabels:['Google Sheets','Resend Email','תבנית הודעה','לוח זמנים'],
+    bubbleBg:'#f5f4f1', bubbleColor:'#1a1a18', avColor:'#FF9800', channel:'אימייל'
   }
+};
 
-  function removeInvoice(btn) {
-    btn.closest('.invoice-row').remove();
-    updateStats();
-    const list = document.getElementById('invoice-list');
-    document.getElementById('empty-state').style.display = list.children.length === 0 ? 'block' : 'none';
-    showToast('הגיליון נמחק');
-  }
+function renderProject(key) {
+  var p = projects[key];
+  function cls(v,i){ if(v==='✓') return 'done'; if(v===String(i+1)) return 'cur'; return ''; }
 
-  function updateStats() {
-    const count = document.getElementById('invoice-list').children.length;
-    document.querySelector('.stat-num').textContent = count;
-  }
+  var html = '<div class="proj-header">'
+    +'<div class="proj-avatar" style="background:'+p.iconBg+'">'+p.icon+'</div>'
+    +'<div style="flex:1"><div class="proj-name">'+p.title+'</div><div class="proj-desc">'+p.desc+'</div></div>'
+    +'<span class="badge '+p.statusClass+'">● '+p.status+'</span></div>';
 
-  function confirmSend() {
-    closeModal('modal-send');
-    showToast('החשבונות נשלחו בהצלחה לכל הלקוחות ✓');
+  html += '<div class="steps-bar">';
+  for(var i=0;i<4;i++){
+    var c=cls(p.steps[i],i);
+    html+='<div class="step">'+(i<3?'<div class="step-line"></div>':'')
+      +'<div class="step-dot '+c+'">'+p.steps[i]+'</div>'
+      +'<div class="step-lbl'+(c==='cur'?' cur':'')+'">'+p.stepLabels[i]+'</div></div>';
   }
+  html += '</div>';
 
-  function fakeUpload() {
-    closeModal('modal-csv');
-    showToast('הקובץ הועלה בהצלחה ✓');
-  }
+  html += '<div class="section-label">תצוגת הודעה</div>'
+    +'<div class="msg-box"><div class="msg-tabs"><div class="mtab on">'+p.channel+'</div></div>'
+    +'<div class="msg-body">'
+    +'<div class="av" style="background:'+p.avColor+'">📡</div>'
+    +'<div class="bubble" style="background:'+p.bubbleBg+';color:'+p.bubbleColor+'">'
+    +'שלום <span class="vtag">{{שם_לקוח}}</span> 👋<br><br>'
+    +'הודעה מ<strong>'+p.title+'</strong><br>'
+    +'מספר: <span class="vtag">{{מספר}}</span> | תאריך: <span class="vtag">{{תאריך}}</span><br><br>'
+    +'לפרטים: <span style="color:#1a5fa8">{{קישור}}</span>'
+    +'</div></div></div>';
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toast-msg').textContent = msg;
-    t.classList.add('show');
-    clearTimeout(window._tt);
-    window._tt = setTimeout(() => t.classList.remove('show'), 2800);
+  html += '<div class="section-label">סטטיסטיקות</div><div class="stats">';
+  for(var j=0;j<3;j++){
+    html+='<div class="stat"><div class="stat-n">'+p.stats[j]+'</div><div class="stat-l">'+p.statLabels[j]+'</div></div>';
   }
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
 
-  document.querySelectorAll('.modal-overlay').forEach(el => {
-    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
-  });
-  // Update time display
-  function setUpdateTime() {
-    const now = new Date();
-    const days = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-    const day = days[now.getDay()];
-    const date = now.toLocaleDateString('he-IL', {day:'2-digit',month:'2-digit',year:'numeric'});
-    const time = now.toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'});
-    const el = document.getElementById('update-time');
-    if (el) el.innerHTML = `יום ${day}<br>${date} · ${time}`;
-  }
-  setUpdateTime();
+function openProject(key) {
+  if(!projects[key]) return;
+  currentProject = key;
+  document.querySelectorAll('.proj-item').forEach(function(el){ el.classList.remove('active-proj'); });
+  var el = document.getElementById('pi-'+key);
+  if(el) el.classList.add('active-proj');
+  document.getElementById('main-title').textContent = projects[key].title;
+  document.getElementById('main-sub').textContent = projects[key].sub;
+  renderProject(key);
+}
+
+function toggleProjects() {
+  var list = document.getElementById('proj-list');
+  var chev = document.getElementById('chevron');
+  list.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  setTimeout(function(){ document.getElementById('new-proj-name').focus(); }, 50);
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('new-proj-name').value='';
+  document.getElementById('new-proj-desc').value='';
+}
+
+document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.getElementById('new-proj-name').addEventListener('keydown', function(e){ if(e.key==='Enter') addProject(); });
+
+function addProject() {
+  var name = document.getElementById('new-proj-name').value.trim();
+  var desc = document.getElementById('new-proj-desc').value.trim();
+  var ch   = document.getElementById('new-proj-channel').value;
+  if(!name) { document.getElementById('new-proj-name').focus(); return; }
+
+  var key = 'proj_'+(++newCounter);
+  var color = COLORS[newCounter % COLORS.length];
+  var chLabel = ch==='wa'?'WhatsApp':ch==='sms'?'SMS':'אימייל';
+
+  projects[key] = {
+    title:name, sub:'Google Sheets → '+chLabel,
+    icon:'⚪', iconBg:'#f5f4f1', dot:color,
+    status:'טיוטה', statusClass:'bg-amber',
+    desc: desc||'פרויקט חדש — הגדר ערוצים ומקורות נתונים',
+    stats:['0','—','—'], statLabels:['הודעות נשלחו','שיעור פתיחה','גבייה שהואצה'],
+    steps:['1','2','3','4'], stepLabels:['Google Sheets','ערוץ שליחה','תבנית הודעה','לוח זמנים'],
+    bubbleBg:'#f5f4f1', bubbleColor:'#1a1a18', avColor:color, channel:chLabel
+  };
+
+  var list = document.getElementById('proj-list');
+  var addBtn = list.querySelector('.proj-add');
+  var item = document.createElement('div');
+  item.className = 'proj-item';
+  item.id = 'pi-'+key;
+  item.innerHTML = '<div class="proj-dot" style="background:'+color+'"></div>'+name;
+  item.addEventListener('click',(function(k){ return function(){ openProject(k); }; })(key));
+  list.insertBefore(item, addBtn);
+
+  closeModal();
+  openProject(key);
+}
+
+renderProject('soliqa');
 </script>
 </body>
 </html>
